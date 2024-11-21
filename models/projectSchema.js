@@ -2,11 +2,11 @@ import mongoose from 'mongoose'
 
 var Schema = mongoose.Schema
 var projectSchema = new Schema({
-    Title:{
+    title:{
     type:String,
     required:true
 },
-List_of_Todos :
+list_of_Todos :
    [{type:Schema.Types.ObjectId,
     ref:'Todo'
    }]

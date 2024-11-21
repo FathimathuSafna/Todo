@@ -1,12 +1,21 @@
 import Project from "../models/projectSchema.js";
 
+
 const addDetails = async (req,res)=>{
+    const { title } = req.body
     try{
+        let existProject = await Project.findOne({title})
+        if(!existProject){
         const newProject = await Project.create(req.body)
         res.status(201).json({
             msg:"Details added succesfully",
             data:newProject
         })
+    } else {
+        res.status(400).json({
+            msg:"already exist"
+        })
+    }
     }
     catch(err){
         res.status(400).json(err)
@@ -16,7 +25,7 @@ const addDetails = async (req,res)=>{
 const getProjectDetails = async(req,res)=>{
   try{
      let id = req.params.id
-      const ProjectDetails = await Project.find({_id:id})
+      const ProjectDetails = await Project.findById(id)
       res.status(201).json({
           msg:"suceesfully retrived",
           data:ProjectDetails

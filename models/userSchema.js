@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 
 var Schema = mongoose.Schema
 var userSchema = new Schema({
-    Name:{
+    name:{
         type:String,
         required:true
     },
