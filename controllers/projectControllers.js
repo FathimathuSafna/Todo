@@ -1,5 +1,5 @@
 import Project from "../models/projectSchema.js";
-
+import Todo from "../models/TodoSchema.js";
 
 const addDetails = async (req,res)=>{
     const { title } = req.body
@@ -54,8 +54,10 @@ const updateProject = async(req,res)=>{
               new:true,
 
              })
+           
+             
         res.status(201).json({
-            msg:"Hospital details updated succesfully",
+            msg:"details updated succesfully",
             data:updateProject
            
         })
@@ -65,17 +67,21 @@ const updateProject = async(req,res)=>{
 }
 
 const deleteProject = async (req, res) => {
-    try {
-      let id = req.params.id;
-      const deleteDetails = await Project.findByIdAndDelete(id);
-      res.status(201).json({
-        msg:"records deleted succesfully",
-        data:deleteDetails
-      
+    const projectId = req.params.id; 
+   try {
+      const project = await Project.findById(projectId);
+      if (!project) {
+        return res.status(404).json({ msg: "Project not found" });
+      }
+      await Todo.deleteMany({ _id: { $in: project.list_of_Todos } });
+      const deleteDetails = await Project.findByIdAndDelete(projectId);
+      res.status(200).json({
+        msg: "Project and all related Todos deleted successfully",
+        data: deleteDetails,
       });
     } catch (err) {
-      res.status(400).json(err);
+      res.status(400).json({ msg: "Error occurred", error: err.message });
     }
   };
-
+  
 export{addDetails,updateProject,deleteProject,getProjectDetails,listProjects}
