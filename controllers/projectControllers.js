@@ -1,4 +1,5 @@
 import Project from "../models/projectSchema.js";
+import Todo from "../models/TodoSchema.js";
 
 const addProject = async (req, res) => {
   const { title } = req.body;
@@ -39,15 +40,15 @@ const getProjectDetails = async (req, res) => {
       status: "success",
       success: true,
       message: "succesfully Retrived Projects",
-      data: project
+      data: project,
     });
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.status(400).json({
-        status: "failed",
-        success: false,
-        message: err.message,
-      });
+      status: "failed",
+      success: false,
+      message: err.message,
+    });
   }
 };
 
@@ -63,10 +64,10 @@ const getAllProjects = async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({
-        status: "failed",
-        success: false,
-        message: err.message,
-      });
+      status: "failed",
+      success: false,
+      message: err.message,
+    });
   }
 };
 
@@ -86,19 +87,22 @@ const updateProject = async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({
-        status: "failed",
-        success: false,
-        message: err.message,
-      });
+      status: "failed",
+      success: false,
+      message: err.message,
+    });
   }
 };
 
 const deleteProject = async (req, res) => {
+  const projectId = req.params.id;
   try {
-    let id = req.params.id;
-
-    await Project.findByIdAndDelete(id);
-
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ msg: "Project not found" });
+    }
+    await Todo.deleteMany({ _id: { $in: project.list_of_Todos } });
+    const deleteDetails = await Project.findByIdAndDelete(projectId);
     res.status(201).json({
       status: "success",
       success: true,
@@ -106,10 +110,10 @@ const deleteProject = async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({
-        status: "failed",
-        success: false,
-        message: err.message,
-      });
+      status: "failed",
+      success: false,
+      message: err.message,
+    });
   }
 };
 
