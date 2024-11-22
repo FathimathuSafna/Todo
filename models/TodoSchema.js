@@ -10,9 +10,6 @@ var TodoSchema = new Schema ({
         type:String,
         enum:['pending','complete'],
         default:'pending'
-    }, 
-    updated_Date:{
-        type:Date
     }
 },
 {

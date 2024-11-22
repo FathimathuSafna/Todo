@@ -3,43 +3,37 @@ import Todo from "../models/TodoSchema.js";
 
 const addTodo = async (req, res) => {
   const { projectId } = req.body;
+
   try {
     const isProjectExist = await Project.findById(projectId);
-    console.log(isProjectExist);
+
     if (isProjectExist) {
       const newTodo = await Todo.create(req.body);
-      isProjectExist.list_of_Todos.push(newTodo._id); // append the todo to the listOfTodo to the project db
+
+      isProjectExist.list_of_todos.push(newTodo._id);
+
       await isProjectExist.save();
+
       res.status(201).json({
-        msg: "Details added succesfully",
+        status: "success",
+        success: true,
+        message: "Details added succesfully",
         data: newTodo,
       });
     } else {
       res.status(400).json({
-        msg: "invalid id",
+        status: "failed",
+        success: false,
+        message: "project with this id not found",
       });
     }
   } catch (err) {
-    res.status(400).json(err);
-  }
-};
-const getTodo = async (req, res) => {
-  try {
-    let id = req.params.id;
-    if (!id) {
-      return res.status(400).json({
-        msg: "Invalid id",
-      });
-    }
-    const ProjectDetails = await Project.findById(id).populate("list_of_Todos");
-    res.status(201).json({
-      msg: "suceesfully retrived",
-      data: ProjectDetails,
+    console.log("error");
+    res.status(400).json({
+      status: "failed",
+      success: false,
+      message: err.message,
     });
-  } catch (err) {
-    console.log(err);
-
-    res.status(400).json(err);
   }
 };
 
@@ -51,12 +45,19 @@ const updateTodo = async (req, res) => {
       { _id: id },
       { $set: { status, description } }
     );
+
     res.status(201).json({
-      msg: "details updated succesfully",
+      status: "success",
+      success: true,
+      message: "Details updated succesfully",
       data: updateTodo,
     });
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({
+      status: "failed",
+      success: false,
+      message: err.message,
+    });
   }
 };
 
@@ -68,20 +69,49 @@ const deleteTodo = async (req, res) => {
       return res.status(404).json({ msg: "Todo not found" });
     }
     const updatedProjects = await Project.updateMany(
-      { list_of_Todos: { $in: [toDo._id] } }, // Find Projects that reference this Todo
-      { $pull: { list_of_Todos: toDo._id } } // pull for Remove the Todo ID from the list_of_Todos array
+      { list_of_todos: { $in: [toDo._id] } }, // Find Projects that reference this Todo
+      { $pull: { list_of_todos: toDo._id } } // pull for Remove the Todo ID from the list_of_todos array
     );
-    const deletedTodo = await Todo.findByIdAndDelete(toDoId);
-    res.status(200).json({
-      msg: "Todo and its references in Projects deleted successfully",
+    await Todo.findByIdAndDelete(toDoId);
+
+    res.status(201).json({
+      status: "success",
+      success: true,
+      message: "Todo and its references in Projects deleted successfully",
       data: {
         updatedProjects: updatedProjects.modifiedCount, // Count of projects where the Todo was removed
-        deletedTodo,
       },
     });
   } catch (err) {
-    res.status(400).json({ msg: "Error occurred", error: err.message });
+    res.status(400).json({
+      status: "failed",
+      success: false,
+      message: err.message,
+    });
   }
 };
+const getTodo = async (req, res) => {
+    try {
+      let id = req.params.id;
+      if (!id) {
+        return res.status(400).json({
+          msg: "Invalid id",
+        });
+      }
+      const ProjectDetails = await Project.findById(id).populate("list_of_todos");
+      res.status(201).json({
+        status: "success",
+        success: true,
+        message: "Todo succesfully retrived",
+        data:ProjectDetails
+      });
+    } catch (err) {
+        res.status(400).json({
+            status: "failed",
+            success: false,
+            message: err.message,
+          });
+    }
+}
 
-export { addTodo, getTodo, updateTodo, deleteTodo };
+export { addTodo, updateTodo, deleteTodo, getTodo };
