@@ -101,7 +101,7 @@ const deleteProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({ msg: "Project not found" });
     }
-    await Todo.deleteMany({ _id: { $in: project.list_of_Todos } });
+    await Todo.deleteMany({ _id: { $in: project.list_of_todos } });
     const deleteDetails = await Project.findByIdAndDelete(projectId);
     res.status(201).json({
       status: "success",
