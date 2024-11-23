@@ -69,8 +69,8 @@ const deleteTodo = async (req, res) => {
       return res.status(404).json({ msg: "Todo not found" });
     }
     const updatedProjects = await Project.updateMany(
-      { list_of_todos: { $in: [toDo._id] } }, // Find Projects that reference this Todo
-      { $pull: { list_of_todos: toDo._id } } // pull for Remove the Todo ID from the list_of_todos array
+      { list_of_todos: { $in: [toDo._id] } }, 
+      { $pull: { list_of_todos: toDo._id } } 
     );
     await Todo.findByIdAndDelete(toDoId);
 
@@ -79,7 +79,7 @@ const deleteTodo = async (req, res) => {
       success: true,
       message: "Todo and its references in Projects deleted successfully",
       data: {
-        updatedProjects: updatedProjects.modifiedCount, // Count of projects where the Todo was removed
+        updatedProjects: updatedProjects.modifiedCount, 
       },
     });
   } catch (err) {

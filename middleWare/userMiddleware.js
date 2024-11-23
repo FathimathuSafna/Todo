@@ -8,16 +8,23 @@ const protect = AsyncHandler(async (req, res, next) => {
     let decoded = jwt.verify(token,process.env.JWT_SECRET_KEY)
     let isUser = await User.findOne({ _id : decoded.id })
     if ( !isUser ) {
-      res.status(401).json({ msg: 'user not found..' })
-      throw new Error('Not Autherized')
+     return  res.status(401).json({ 
+        
+          status: "failed",
+          success: false,
+          message: "user not found..",
+         })
     } else {
       next();
     }
 
   } catch (error) {
 
-    res.status(401).json({ msg: 'Not authorized..' })
-    throw new Error('Not authorized, token failed');
+   return res.status(401).json({ 
+    status: "failed",
+    success: false,
+    message: "Not authorized..",
+    })
 
   }
 });
