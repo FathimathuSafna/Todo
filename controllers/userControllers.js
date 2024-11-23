@@ -1,4 +1,5 @@
 import User from "../models/userSchema.js";
+import generateToken from "../utils/generateToken.js";
 
 const addUserDetails =  async (req,res) =>{
     const { email } = req.body
@@ -24,14 +25,18 @@ const userLogin = async (req,res)=>{
     const { email,password } = req.body
     try{
         const existAdmin = await User.findOne({email})
+        console.log(existAdmin);
+
         if(!existAdmin){
             res.status(400).json({
                 msg:"Admin not found"
             })
         }
+        
         if(await existAdmin.matchPassword(password)){
             return res.status(200).json({
-                msg: "login success"
+                msg: "login success",
+                data:generateToken(existAdmin._id)
                 
             })
         } else {
